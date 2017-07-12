@@ -4,10 +4,9 @@ Use "d3-pre ovamsterdam.html" to pre-render the d3 visualization.
 TODO
   -clip extent
   -dubbele lijnen voor meerdere tram/metro lijnen
-
-    -functie voor lijnen
-  -group things for clearer svg and titles in prerender
+    -functie voor lijnen tekenen
   -split stationsnamen
+  -stationsnamen on top
 */
 
 var margin = {top: 40, right: 40, bottom: 40, left: 40};
