@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Spoor OV Amsterdam</title>
+  <style>
+
+  body { 
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  .path {
+    stroke-linejoin: round;
+  }
+
+  .label {
+    font-size: small;
+    text-anchor: start;
+    fill: black;
+  }
+
+  body {
+    text-align: center;
+  }
+
+  .buurt:hover {
+    opacity: 0.65;
+  }
+
+  /*Lines*/
+
+ .buurt-borders {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 0.4px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  .stadsdeel-borders {
+    fill: none;
+    stroke: black;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    pointer-events: none;
+    opacity: 0.1;
+  }
+
+  .spoor {
+    fill: none;
+    stroke-linejoin: round;
+  }
+
+  .train {
+    stroke: black;
+    stroke-width: 2;
+    opacity: 0.5;
+  }
+
+  .tram {
+  }
+
+  .metro {
+     stroke-dasharray: 5,1;
+  }
+
+  /*Points*/
+  .station {
+    fill: #ffb310;
+/*    opacity: 0.9;
+*/    r: 4;
+    stroke: #092869;
+    stroke-width: 2;
+    z-index: 3;
+  }
+
+  .stationnaam{
+    z-index: 4;
+    fill: black;
+    font-size: x-small;
+    text-anchor: middle;
+  }
+
+  .station:hover {
+    stroke: #ffb310;
+  }
+
+  .halte {
+    r: 1.5;
+    fill: white;
+    opacity: 0.8;
+    z-index: -1;
+  }
+
+
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <script src="http://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
+  <script src="http://d3js.org/topojson.v2.min.js"></script>
+</head>
+
+<body>
+
+<h1>Spoor Infrastructuur Regio Amsterdam</h1>
+
+<svg width="900" height="800" id="map"></svg>
+
+<p> Bron: Gemeenste Amsterdam, NS</p>
+<script src="main.js"></script>
+
+</body>
+
+</html>
