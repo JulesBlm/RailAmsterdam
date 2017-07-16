@@ -33,23 +33,7 @@ var stadsdeel = {"A": "Centrum","B": "Westpoort", "E": "West", "M": "Oost", "K":
 
 var colorScale = d3.scaleOrdinal(d3.schemeCategory20)
     colorStadsdelen = d3.scaleOrdinal(d3.schemePastel2); //d3.schemeGreys
-
-/* 
-one functie voor lijnen, een functie voor cirkels
-
-+startpunt
-
-function svgItem(shape, mode, width, color, n) {
-  svg.append(shape)
-  .attr("class", mode)
-  .attr("stroke", color)
-  .attr("stroke-width", 7)
-  .attr("x1", 5 + n * 50)
-  .attr("x2", 50 + n * 50);
-  .attr("y1", n * 20)
-  .attr("y2", n * 20)
-}
-*/
+    colorLines = d3.scaleSequential(d3.interpolateRainbow);
 
 svg.append("text")
   .attr("x", 0)
@@ -134,14 +118,17 @@ d3.queue()
     .defer(d3.csv,  "treinstations.csv")
     .await(ready);
 
-function ready(error, buurten, trammetro, trammetrostations, spoor, treinstations) {
+function ready(error, buurten, trammetrotopo, trammetrostations, spoor, treinstations) {
   if (error) throw error;
 
   /* Areas */
+  var stadsdelen = topojson.feature(buurten, buurten.objects.buurten).features;
+
+  // projection.fitSize([width, height], buurten);
 
   // Draw the buurten
   svg.selectAll(".buurt")
-      .data(topojson.feature(buurten, buurten.objects.buurten).features)
+      .data(stadsdelen)
     .enter().insert("g")
       .append("path")
         .attr("class", "buurt")
@@ -161,44 +148,34 @@ function ready(error, buurten, trammetro, trammetrostations, spoor, treinstation
       .attr("d", path(topojson.mesh(buurten, buurten.objects.buurten, function(a, b) { return stadsdeel[a.properties.Stadsdeel_code] !== stadsdeel[b.properties.Stadsdeel_code]; })));
 
   /* Lines */
-
-  // UNFINISHED: Check how long lijnen array is, draw path that many times
-  /* for n in lijnen.length:
-      draw path, twee keer zo breed
-        path.color = colorScale(n)
-  */
-
-  // function drawline(numberoflines, path) {
-
-  // }
-
   // Draw the tram/metro tracks
-  svg.selectAll(".trammetro")
-      .data(topojson.feature(trammetro, trammetro.objects.trammetro).features)
-    .enter().insert("g")
-      // .attr("aantalLijnen", function(d) { return d.properties.Lijn.split(/ \| /g).length})
-      // .attr("lijnNummers", function(d) { return d.properties.Lijn.split(/ \| /g) })
-      // .attr("lijnNummers2", function(d) {
-      //       var lijnNummers = d.properties.Lijn.split(/ \| /g)
+  var trammetro = topojson.feature(trammetrotopo, trammetrotopo.objects.trammetro);
 
-      //       lijnNummers.forEach(function(e) {
-      //         // console.log(e)
-      //         //Append een path met kleur
-      //         // d3.append("path")
-      //         //   .attr("d", path)
-      //         //   .attr("class", "tram spoor")
-      //         //   .attr("stroke", colorScale(e))
+  // Get the number of tracks for each line
+  trammetro.features.forEach(function(d) { d.properties.tracks = d.properties.Lijn.split(/ \| /g).length; });
 
-      //       })
-      //   })
-      .append("path")
-        .attr("d", path)
-        .attr("stroke-width", function(d) { return 1.5 * d.properties.Lijn.split(/ \| /g).length  })
-        .attr("stroke", function(d) { return (colorScale(d.properties.Lijn.split(/ \| /g)[0]) ) })
-        .attr("d", path)
+  colorLines.domain([0, d3.max(trammetro.features, function(d) { return d.properties.tracks; })]);
+
+  var railLine = svg.append('g').attr('class', 'rail-lines')
+          .selectAll('.rail-line').data(trammetro.features)
+      .enter().append('g')
+          .attr('class', 'spoor');
+      
+  railLine
+      .selectAll('.track')
+      .data(function(lineString) {
+          // Duplicate the lineString feature based on the number of tracks
+          return d3.range(0, lineString.properties.tracks)
+              .map(function() { return lineString; }); 
+      })
+      .enter().append('path')
         .attr("class", function(d) { return "spoor " + d.properties.Modaliteit.toLowerCase() })
-        .append("title")
-          .text(function(d) { return ((d.properties.Lijn).length == 1 ? "Lijn: " : "Lijnen: ") + d.properties.Lijn });
+        .attr('d', function(lineString, i) {
+            // Offset each lineString by 50 meters
+            var lineStringOffset = turf.lineOffset(lineString, i * 40, "meters");
+            return path(lineStringOffset);
+        })
+        .attr('stroke', function(d, i) { return colorLines(i); }); 
 
   // Draw the train tracks
   svg.selectAll(".train")
