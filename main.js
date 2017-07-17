@@ -33,7 +33,7 @@ var stadsdeel = {"A": "Centrum","B": "Westpoort", "E": "West", "M": "Oost", "K":
 
 var colorScale = d3.scaleOrdinal(d3.schemeCategory20)
     colorStadsdelen = d3.scaleOrdinal(d3.schemePastel2); //d3.schemeGreys
-    colorLines = d3.scaleSequential(d3.interpolateRainbow);
+    colorLines = d3.scaleSequential(d3.schemeCategory20);
 
 svg.append("text")
   .attr("x", 0)
@@ -48,6 +48,7 @@ var spacingy = 20
 var x0 = 5
 var spacingx = 55
 
+/*Legenda*/
 svg.append("line")
   .attr("class", "tram")
   .attr("stroke", colorScale(1))
@@ -124,8 +125,6 @@ function ready(error, buurten, trammetrotopo, trammetrostations, spoor, treinsta
   /* Areas */
   var stadsdelen = topojson.feature(buurten, buurten.objects.buurten).features;
 
-  // projection.fitSize([width, height], buurten);
-
   // Draw the buurten
   svg.selectAll(".buurt")
       .data(stadsdelen)
@@ -175,7 +174,9 @@ function ready(error, buurten, trammetrotopo, trammetrostations, spoor, treinsta
             var lineStringOffset = turf.lineOffset(lineString, i * 40, "meters");
             return path(lineStringOffset);
         })
-        .attr('stroke', function(d, i) { return colorLines(i); }); 
+        .attr("stroke", function(d, i) { return (colorScale(d.properties.Lijn.split(/ \| /g)[i]) ) })
+      .append("title")
+        .text(function(d) { return ((d.properties.Lijn).length !== 1 ? "Lijnen: " : "Lijn: ") + d.properties.Lijn }); 
 
   // Draw the train tracks
   svg.selectAll(".train")
