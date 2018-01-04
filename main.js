@@ -13,8 +13,7 @@ var margin = {top: 40, right: 40, bottom: 40, left: 40};
 
 var svg = d3.select("#map"),
     width = +svg.attr("width"),
-    height = +svg.attr("height"),
-    format = d3.format(",d");
+    height = +svg.attr("height");
 
 // Should really change this to 'clipExtent' instead of center
 var projection = d3.geoAlbers() 
@@ -170,8 +169,8 @@ function ready(error, buurten, trammetrotopo, trammetrostations, spoor, treinsta
       .enter().append('path')
         .attr("class", function(d) { return "spoor " + d.properties.Modaliteit.toLowerCase() })
         .attr('d', function(lineString, i) {
-            // Offset each lineString by 50 meters
-            var lineStringOffset = turf.lineOffset(lineString, i * 40, "meters");
+            //Offset each lineString by 60 meters
+            var lineStringOffset = turf.lineOffset(lineString.geometry, i * 60,  {units: "meters"});
             return path(lineStringOffset);
         })
         .attr("stroke", function(d, i) { return (colorScale(d.properties.Lijn.split(/ \| /g)[i]) ) })
